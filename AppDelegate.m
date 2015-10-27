@@ -23,9 +23,6 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     
-    // Initialize database.
-    [self createDatabase];
-    
     // >>> Google Analytics <<<
     // Optional: automatically send uncaught exceptions to Google Analytics.
     [GAI sharedInstance].trackUncaughtExceptions = YES;
@@ -34,7 +31,7 @@
     // Optional: set Logger to VERBOSE for debug information.
     [[[GAI sharedInstance] logger] setLogLevel:kGAILogLevelVerbose];
     // Initialize tracker. Replace with your tracking ID.
-    [[GAI sharedInstance] trackerWithTrackingId:@"UA-65312459-1"];
+    [[GAI sharedInstance] trackerWithTrackingId:@"tracking ID"];
     // Enable IDFA collection.
     id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
     [tracker setAllowIDFACollection:YES];
@@ -91,34 +88,6 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-}
-
-- (void)createDatabase {
-    // Home Path: /var/mobile/Containers/Data/Application/E42AF3AB-53EC-4278-9E26-80BD4CE9BBFD
-    NSString *homePath = NSHomeDirectory();
-    NSLog(@"[%@ : %@] homePath = %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), homePath);
-    
-    // Document Path: /var/mobile/Containers/Data/Application/E42AF3AB-53EC-4278-9E26-80BD4CE9BBFD/Documents
-    NSArray *docDirectory = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentPath = [docDirectory objectAtIndex:0];
-    NSLog(@"[%@ : %@] docDirectory = %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), documentPath);
-    
-    NSString *dbDirectory = [documentPath stringByAppendingPathComponent:@"database"];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:dbDirectory])
-    {
-        // New dbPath.
-        [[NSFileManager defaultManager] createDirectoryAtPath:dbDirectory withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-    
-    NSString *dbPath = [dbDirectory stringByAppendingPathComponent:@"iTravelEx.db"];
-    
-    self.fmdbq = [FMDatabaseQueue databaseQueueWithPath:dbPath];
-    NSLog(@"[%@] fmdbq = %@", NSStringFromClass([self class]), self.fmdbq);
-    
-    [self.fmdbq inDatabase:^(FMDatabase *db) {
-        [db executeUpdate:@"CREATE TABLE IF NOT EXISTS rateTable (id INTEGER PRIMARY KEY AUTOINCREMENT, currency TEXT, select_rate TEXT, rate FLOAT, updateTime TEXT)"];
-        [db executeUpdate:@"CREATE TABLE IF NOT EXISTS abTable (id INTEGER PRIMARY KEY AUTOINCREMENT, filename TEXT, travel_country TEXT DEFAULT NULL, currency1 TEXT DEFAULT NULL, currency2 TEXT DEFAULT NULL)"];
-    }];
 }
 
 @end
